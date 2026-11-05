@@ -1,0 +1,13 @@
+# environments, caches, local artefacts
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+# the spike archive (own venv, downloads, scratch): kept on disk, not part of the repo
+feasibility/
+# data is public but not redistributed here: see README (download + `python -m cmapss.audit`)
+CMAPSSData/
+# local MLflow stores
+mlruns/
+*.db

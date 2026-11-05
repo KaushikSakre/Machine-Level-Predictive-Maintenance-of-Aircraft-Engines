@@ -1,0 +1,19 @@
+# Versions are those actually installed and tested on the dev machine (Windows 11, Python 3.13).
+# pandas and shap are DELIBERATELY absent: Windows Smart App Control blocks pandas' unsigned extensions here.
+# The code is numpy-only; feature importance uses LightGBM's native TreeSHAP (predict(..., pred_contrib=True)).
+numpy==2.5.4
+scipy==1.18.1
+scikit-learn==1.9.1
+lightgbm==4.7.0
+torch==2.15.0
+matplotlib==3.11.2
+joblib==1.6.0
+fastapi==0.162.0
+uvicorn==0.54.0
+pydantic==2.14.2
+httpx==0.28.1
+requests==2.34.2
+mlflow==3.18.0
+streamlit==1.66.1
+pytest==9.2.0
+# stage 3 may add optuna for the hyper-parameter search (not installed yet; a plain grid is the fallback)

@@ -124,3 +124,13 @@ Run with `PYTHONPATH=src python -m pytest` (`pytest.ini` also sets the path).
 * Report **mean ± standard deviation over ≥ 5 seeds and several validation splits**; call models "comparable" when the gap is within the spread.
 * Report RMSE against raw and capped RUL, plus the NASA score against raw RUL.
 * Feature importance is a property of the *fitted model*. It is never presented as the cause of failure.
+
+## 8. `src/cmapss/eda.py` — exploratory analysis (stage 2)
+
+`PYTHONPATH=src python -m cmapss.eda` reads the **training files only** and writes figures to `results/figures/` and tables to `results/eda_summary.json` and `results/eda_sensor_table.md`.
+
+* `regime_norm(tr, k)` — the same per-regime z-score as `lib.Preprocessor` (KMeans on operating settings, then normalise each sensor with its regime's mean/std), but it keeps **all 21 sensors**. A sensor whose within-regime std is below `1e-5` gets std = 1, so it shows up as a flat line at 0 instead of exploding. The script asserts that the set of flat sensors it finds equals the set the pipeline's selector drops.
+* `eta2(x, cond)` — the share of a sensor's variance explained by the operating regime (0 with one regime, near 1 when the regime explains almost everything).
+* `rho(x, y)` — Spearman correlation between a sensor and RUL. It describes a monotone trend; it is **not** evidence of cause.
+* `binned(z, rul, edges)` — median and 10–90% band of a sensor in bins of remaining life, pooled over all engines.
+* Figures: `eda_trends_FDxxx.png` (21 sensor panels per subset, flat sensors marked in red), `eda_normalisation_FD002/FD004.png` (operating-setting clusters, and the two strongest sensors raw vs normalised), `eda_engine_lengths.png` (train vs truncated test lengths).

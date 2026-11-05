@@ -1,0 +1,17 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-9.2.0, pluggy-1.7.0 -- D:\DA-project\feasibility\venv\Scripts\python.exe
+rootdir: D:\DA-project
+configfile: pytest.ini
+plugins: anyio-4.16.0
+collecting ... collected 7 items
+
+tests/test_audit.py::test_audit_passes_on_real_data PASSED               [ 14%]
+tests/test_audit.py::test_audit_detects_tampered_file PASSED             [ 28%]
+tests/test_no_leakage.py::test_fitted_objects_never_see_val_or_test[FD001] PASSED [ 42%]
+tests/test_no_leakage.py::test_fitted_objects_never_see_val_or_test[FD004] PASSED [ 57%]
+tests/test_no_leakage.py::test_split_is_engine_wise_and_fit_rows_match_train[FD001] PASSED [ 71%]
+tests/test_no_leakage.py::test_split_is_engine_wise_and_fit_rows_match_train[FD004] PASSED [ 85%]
+tests/test_no_leakage.py::test_negative_control_detects_deliberate_leak PASSED [100%]
+
+======================== 7 passed in 82.08s (0:01:22) =========================
+EXIT 0

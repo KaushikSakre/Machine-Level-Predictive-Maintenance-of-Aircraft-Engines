@@ -37,3 +37,30 @@ Tests (`results/stage1_pytest.log`): **7 passed in 39.9 s** (2 audit tests, 5 le
 * Docker is not installed on this laptop (no `docker`, no WSL), so no container exists yet; the Dockerfile arrives in the deployment stage and will only be built if Docker becomes available.
 * A fresh-venv install from `requirements.txt` was not tested.
 * No modelling results exist in this repo yet; the spike numbers in `feasibility/REPORT.md` are single-split, single-seed and are not carried over.
+
+## Stage 2: EDA (2026-11-05)
+
+Code: `src/cmapss/eda.py` (run `PYTHONPATH=src python -m cmapss.eda`). Outputs: `results/figures/eda_trends_FD00{1..4}.png`, `eda_normalisation_FD002.png`, `eda_normalisation_FD004.png`, `eda_engine_lengths.png`, `results/eda_summary.json`, `results/eda_sensor_table.md`.
+
+### Decisions
+1. EDA uses the **training files only** (no test data, no models) and is purely descriptive. Correlations are Spearman ρ between a sensor and RUL: a trend measure, **not** a causal statement.
+2. EDA applies the same per-regime normalisation as `lib.Preprocessor` (KMeans on the 3 operating settings, k = 1/6/1/6) but keeps all 21 sensors so flat ones stay visible. The script asserts that its flat-sensor rule agrees exactly with `lib.Preprocessor`'s selector on all four subsets (it did).
+3. **No Jupyter notebook:** Jupyter is not installed and an unexecuted notebook would be misleading. EDA is a script that writes figures and tables; `notebooks/` stays empty for now.
+4. `lib.py` is **unchanged**, so all stage-1 and spike results stay comparable.
+
+### Findings (all from the data; see figures and tables)
+* **Flat sensors** (constant within every operating regime, dropped by the selector): FD001 s1, s5, s10, s16, s18, s19; FD003 s1, s5, s16, s18, s19; FD002 and FD004 s1, s5, s18, s19. In FD001/FD003 they have exactly 1 unique value. In FD002/FD004 they take 6 unique values (2 for s19): they are constant *within* a regime and differ only *between* regimes, i.e. they carry only regime information.
+* **Sensor sets differ across subsets:** s10 is flat in FD001 only; s16 is flat in FD001 and FD003 but kept in FD002/FD004 (where it has just 2 unique values).
+* **Low-resolution (near-binary or stepped) sensors are kept by the selector:** FD001 s6 (2 unique values), FD002/FD004 s16 (2), plus stepped s6/s10/s17 in several subsets. **Open question for stage 3:** whether to add a cardinality rule. Not changed now, to keep results comparable.
+* **Regimes:** every distinct operating-setting combination maps to exactly one KMeans cluster (checked), so k = 6 recovers the six regimes. Regime sizes are uneven: one regime holds 13,458 rows in FD002 and 15,395 in FD004; the other five hold about 8,000 and 9,100 each. That is a property of the data, not a clustering error.
+* **Per-regime normalisation matters a lot in FD002/FD004:** the regime explains about 99% of the variance of each raw sensor (η² 0.99–1.00 for the top sensors). Spearman |ρ| with RUL for the strongest sensors for the four strongest sensors rises from about 0.12–0.18 (raw) to about 0.60–0.73 (normalised); e.g. FD004 s11 0.18 -> 0.73, s4 0.17 -> 0.69. The before/after figures show raw values jumping between six regime levels, and a clean rising trend after normalisation.
+* **Strongest normalised trends (|ρ|):** FD001 s11 0.72, s4 0.70, s12 0.69, s7 0.68; FD002 s11 0.71, s4 0.68, s15 0.67; FD003 s11 0.76, s13 0.74, s8 0.74, s4 0.73; FD004 s11 0.73, s4 0.69, s17 0.64. Sensor s11 has the largest |ρ| in all four subsets.
+* **FD003 differs from FD001:** s7, s12, s15, s20 and s21 have |ρ| about 0.08–0.09 in FD003 although they trend strongly in FD001 (|ρ| 0.66–0.69 for s7, s12, s15, s21). In the FD003 trend figure their median moves only slightly, while the 10–90% band fans out as RUL approaches 0, so engines move in different directions. FD003 has two fault modes (HPC and Fan) per the dataset readme. That is a *hypothesis* for the difference; it was **not tested** (engines are not labelled by mode).
+* **Engine lengths:** train engines run 128–362 cycles (FD001), 128–378 (FD002), 145–525 (FD003), 128–543 (FD004); test engines are truncated (min 19–38, median 132–154 cycles).
+
+### Open items
+* Decide in stage 3 whether to drop near-binary sensors (needs the seed and split protocol to say anything about its effect).
+* Docker still not installed; GitHub remote added (see below).
+
+## Repository connection (2026-11-05)
+`origin` = `https://github.com/KaushikSakre/Machine-Level-Predictive-Maintenance-of-Aircraft-Engines.git`. The remote has no branches (empty). **Nothing has been pushed**; the local branch is `master`. Pushing was left for the owner to confirm.

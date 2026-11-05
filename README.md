@@ -2,7 +2,7 @@
 
 Course project for *Data Analytics Laboratory* (M.Tech, solo, 45 days). Remaining-useful-life (RUL) regression and "fails within 30 cycles" classification on the four NASA C-MAPSS turbofan subsets (FD001–FD004), with a FastAPI + MLflow + Streamlit deployment. **All models are trained from scratch; no pretrained weights are used.**
 
-> Status: **stage 1 of 7 (repo setup) complete.** Modelling stages follow; see `LOG.md` for every decision and each stage's results, and `CODE_GUIDE.md` for how the code works.
+> Status: **stages 1-2 of 7 (repo setup, EDA) complete.** Modelling stages follow; see `LOG.md` for every decision and each stage's results, and `CODE_GUIDE.md` for how the code works.
 
 ## Ground rules
 1. Split by **engine**. Every scaler, clusterer and selector is fitted on training engines only; `tests/test_no_leakage.py` enforces this and must stay green.
@@ -16,7 +16,7 @@ Course project for *Data Analytics Laboratory* (M.Tech, solo, 45 days). Remainin
 src/cmapss/    lib.py (pipeline + models), audit.py (data audit), expected_sha256.json
 tests/         test_no_leakage.py, test_audit.py
 results/       generated outputs (data_audit.json, ...)
-notebooks/     EDA (stage 2)
+notebooks/     (empty: EDA is the script src/cmapss/eda.py; Jupyter not installed)
 deploy/        FastAPI / Streamlit / Docker (stage 7)
 scripts/       experiment runners (later stages)
 CMAPSSData/    the dataset (git-ignored; see below)
@@ -37,6 +37,7 @@ On the development laptop the existing environment `feasibility\venv` is used in
 ```powershell
 $env:PYTHONPATH = "src"
 python -m cmapss.audit          # verifies the data; writes results/data_audit.json
+python -m cmapss.eda            # stage 2: figures to results/figures/, tables to results/
 python -m pytest                # data-audit tests + the leakage test (40 s to 2.5 min depending on free RAM)
 ```
 
@@ -45,7 +46,7 @@ Windows Smart App Control on the development laptop blocks pandas' unsigned exte
 
 ## Stages
 1. Repo setup + data audit  ✅
-2. EDA (sensor trends, constant sensors, per-regime normalisation plots)
+2. EDA (sensor trends, constant sensors, per-regime normalisation plots)  ✅
 3. Regression: Ridge, LightGBM, GRU, TCN, 5 seeds, small hyper-parameter search, RUL cap 100/125/150
 4. Classification: 7 models, 5 seeds, + 3-class health stage
 5. Analysis: TreeSHAP + permutation importance stability, early-warning lead time, cross-subset tests
